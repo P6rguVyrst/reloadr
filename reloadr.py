@@ -4,6 +4,7 @@
 from typing import Any
 from time import sleep
 
+import re
 import inspect
 import threading
 import types
@@ -14,7 +15,7 @@ from watchdog.events import FileSystemEventHandler, FileModifiedEvent
 from watchdog.observers import Observer
 
 __author__ = "Hugo Herter"
-__version__ = '0.4.1'
+__version__ = '0.4.2'
 
 
 def get_new_source(target, kind: str) -> str:
@@ -26,11 +27,12 @@ def get_new_source(target, kind: str) -> str:
     """
     assert kind in ('class', 'def')
     source = inspect.getsource(target)
+    match_decorators = re.compile(
+        r"@reloadr(.*)(?=class)",
+        re.DOTALL,
+    )
+    source = re.sub(match_decorators, '', source)
 
-    if kind == 'def':
-        # `inspect.getsource` will not return the decorators in the source of classes,
-        # but will return them in the source of functions.
-        source = source.replace("@autoreload\n", "")
     return source
 
 
