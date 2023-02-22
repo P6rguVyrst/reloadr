@@ -1,0 +1,4 @@
+build/
+env/
+venv/
+*.egg-info/
